@@ -1,0 +1,12 @@
+com\fletes\exception\ErrorResponse.class
+com\fletes\exception\EntityNotFoundException.class
+com\fletes\service\CamionService.class
+com\fletes\dto\CamionRequestDTO.class
+com\fletes\controller\CamionController.class
+com\fletes\domain\Camion.class
+com\fletes\dto\CamionResponseDTO.class
+com\fletes\repository\CamionRepository.class
+com\fletes\MyEntity.class
+com\fletes\service\CamionServiceImpl.class
+com\fletes\GreetingResource.class
+com\fletes\exception\GlobalExceptionHandler.class
