@@ -63,7 +63,11 @@ async function loadClientes() {
         const data = await response.json();
         
         const tbody = document.querySelector('#clientes-table tbody');
+        const selectReservaCliente = document.getElementById('reservaCliente');
+        
         tbody.innerHTML = '';
+        selectReservaCliente.innerHTML = '<option value="">Seleccione un cliente...</option>';
+        
         data.forEach(cliente => {
             const tr = document.createElement('tr');
             tr.innerHTML = `
@@ -78,6 +82,12 @@ async function loadClientes() {
                 </td>
             `;
             tbody.appendChild(tr);
+            
+            // Llenar select de Clientes en Reservas
+            const option = document.createElement('option');
+            option.value = cliente.id;
+            option.textContent = `#${cliente.id} - ${cliente.nombre} ${cliente.apellido}`;
+            selectReservaCliente.appendChild(option);
         });
     } catch (error) {
         console.error('Error fetching clientes:', error);
@@ -247,6 +257,15 @@ async function loadReservas() {
     }
 }
 
+function formatDateTimeAPI(dt) {
+    if (!dt) return null;
+    let formatted = dt.replace('T', ' ');
+    if (formatted.length === 16) {
+        formatted += ':00'; // añadir segundos por si el navegador los omite
+    }
+    return formatted;
+}
+
 document.getElementById('reservaForm').addEventListener('submit', async (e) => {
     e.preventDefault();
     const idCamionValue = document.getElementById('reservaCamion').value;
@@ -255,8 +274,8 @@ document.getElementById('reservaForm').addEventListener('submit', async (e) => {
     const body = {
         idCliente: parseInt(document.getElementById('reservaCliente').value),
         idCamion: idCamionValue ? parseInt(idCamionValue) : null,
-        fechaDesde: document.getElementById('reservaFechaDesde').value,
-        fechaHasta: document.getElementById('reservaFechaHasta').value,
+        fechaDesde: formatDateTimeAPI(document.getElementById('reservaFechaDesde').value),
+        fechaHasta: formatDateTimeAPI(document.getElementById('reservaFechaHasta').value),
         lugarDesde: document.getElementById('reservaLugarDesde').value,
         lugarHasta: document.getElementById('reservaLugarHasta').value,
         pesoCargaKg: parseFloat(document.getElementById('reservaPeso').value)

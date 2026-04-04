@@ -162,20 +162,22 @@
             </div>
             <form id="reservaForm">
                 <div class="form-group">
-                    <label for="reservaCliente">ID Cliente</label>
-                    <input type="number" id="reservaCliente" required>
+                    <label for="reservaCliente">Cliente</label>
+                    <select id="reservaCliente" required>
+                        <option value="">Seleccione un cliente...</option>
+                    </select>
                 </div>
                 <div class="form-group">
                     <label for="reservaCamion">ID Camión (Opcional, dejar vacío para auto-asignar)</label>
                     <input type="number" id="reservaCamion">
                 </div>
                 <div class="form-group">
-                    <label for="reservaFechaDesde">Fecha Desde (YYYY-MM-DD HH:mm:ss)</label>
-                    <input type="text" id="reservaFechaDesde" placeholder="2026-04-10 08:00:00" required>
+                    <label for="reservaFechaDesde">Fecha Desde</label>
+                    <input type="datetime-local" step="1" id="reservaFechaDesde" required>
                 </div>
                 <div class="form-group">
-                    <label for="reservaFechaHasta">Fecha Hasta (YYYY-MM-DD HH:mm:ss)</label>
-                    <input type="text" id="reservaFechaHasta" placeholder="2026-04-11 18:00:00" required>
+                    <label for="reservaFechaHasta">Fecha Hasta</label>
+                    <input type="datetime-local" step="1" id="reservaFechaHasta" required>
                 </div>
                 <div class="form-group">
                     <label for="reservaLugarDesde">Lugar Desde</label>
