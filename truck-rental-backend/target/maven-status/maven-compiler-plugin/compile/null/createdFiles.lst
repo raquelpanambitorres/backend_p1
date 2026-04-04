@@ -1,0 +1,7 @@
+com\fletes\controller\ClienteController.class
+com\fletes\service\ClienteService.class
+com\fletes\dto\ClienteRequestDTO.class
+com\fletes\repository\ClienteRepository.class
+com\fletes\service\ClienteServiceImpl.class
+com\fletes\domain\Cliente.class
+com\fletes\dto\ClienteResponseDTO.class
