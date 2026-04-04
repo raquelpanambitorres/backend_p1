@@ -1,16 +1,17 @@
 package com.fletes.service;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 import com.fletes.domain.Camion;
 import com.fletes.dto.CamionRequestDTO;
 import com.fletes.dto.CamionResponseDTO;
 import com.fletes.exception.EntityNotFoundException;
 import com.fletes.repository.CamionRepository;
+
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
-
-import java.util.List;
-import java.util.stream.Collectors;
 
 @ApplicationScoped
 public class CamionServiceImpl implements CamionService {
@@ -66,6 +67,22 @@ public class CamionServiceImpl implements CamionService {
         repository.update(camion);
     }
 
+    @Override
+    @Transactional
+    public void setEstado(Integer id, boolean estado) {
+        Camion camion = repository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Camión no encontrado con ID " + id));
+        camion.setEstado(estado);
+        repository.update(camion);
+    }
+
+    @Override
+    public boolean getEstado(Integer id) {
+        Camion camion = repository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Camión no encontrado con ID " + id));
+        return camion.getEstado();
+    }
+
     private CamionResponseDTO toDTO(Camion camion) {
         CamionResponseDTO dto = new CamionResponseDTO();
         dto.setId(camion.getId());
@@ -77,3 +94,4 @@ public class CamionServiceImpl implements CamionService {
         return dto;
     }
 }
+
