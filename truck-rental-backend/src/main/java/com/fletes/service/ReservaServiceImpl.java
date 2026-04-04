@@ -39,19 +39,18 @@ public class ReservaServiceImpl implements ReservaService {
     public ReservaResponseDTO create(ReservaRequestDTO dto) {
         Reserva reserva = new Reserva();
         Optional<CamionResponseDTO> camion;
-
         if (dto.getFechaDesde().after(dto.getFechaHasta())) {
             throw new IllegalArgumentException("La fecha de inicio no puede ser posterior a la fecha de fin");
         }
         if (dto.getIdCamion() == null) {
             List<CamionResponseDTO> camionesDisponibles = camionService.getAll();
             camion = camionesDisponibles.stream()
-                                    .filter(c -> c.getCapacidadCargaKg() >= dto.getPesoCargaKg())
-                                    .findAny();
+                    .filter(c -> c.getCapacidadCargaKg() >= dto.getPesoCargaKg())
+                    .findAny();
             if (!camion.isPresent()) {
                 throw new EntityNotFoundException("No hay camiones disponibles con la capacidad de carga requerida");
             }
-        }else{
+        } else {
             camion = Optional.ofNullable(camionService.getById(dto.getIdCamion()));
             if (camion.get().getCapacidadCargaKg() < dto.getPesoCargaKg()) {
                 throw new IllegalArgumentException("El camión seleccionado no tiene la capacidad de carga requerida");
@@ -60,7 +59,8 @@ public class ReservaServiceImpl implements ReservaService {
 
         // camionService.setEstado(camion.get().getId(), false);
         reserva.setIdCamion(camionRepository.findById(camion.get().getId()).get());
-        reserva.setIdCliente(clienteRepository.findById(dto.getIdCliente()).get());
+        reserva.setIdCliente(clienteRepository.findById(dto.getIdCliente())
+                .orElseThrow(() -> new EntityNotFoundException("Cliente no encontrado con ID " + dto.getIdCliente())));
         reserva.setFechaDesde(dto.getFechaDesde());
         reserva.setFechaHasta(dto.getFechaHasta());
         reserva.setLugarDesde(dto.getLugarDesde());
@@ -114,7 +114,7 @@ public class ReservaServiceImpl implements ReservaService {
     }
 
     @Transactional
-    @Scheduled(every="3s") // cada 3 segundos
+    @Scheduled(every = "3s") // cada 3 segundos
     @SuppressWarnings("unused")
     void actualizarDisponibilidad() {
         if (repository.count() > 0) {
@@ -126,7 +126,7 @@ public class ReservaServiceImpl implements ReservaService {
                     reserva.setEstado(false);
                     repository.update(reserva);
                     camionService.setEstado(reserva.getIdCamion().getId(), true);
-                }else if (reserva.getFechaDesde().before(new Timestamp(System.currentTimeMillis()))) {
+                } else if (reserva.getFechaDesde().before(new Timestamp(System.currentTimeMillis()))) {
                     camionService.setEstado(reserva.getIdCamion().getId(), false);
                 }
             }
