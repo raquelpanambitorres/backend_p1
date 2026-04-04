@@ -1,25 +1,28 @@
 package com.fletes.dto;
 
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
 public class ClienteRequestDTO {
 
     @NotBlank(message = "El nombre no puede estar vacío")
+    @NotNull(message = "El nombre no puede ser nulo")
     @Size(max = 50, message = "El nombre no puede exceder los 50 caracteres")
     private String nombre;
 
     @NotBlank(message = "El apellido no puede estar vacío")
+    @NotNull(message = "El apellido no puede ser nulo")
     @Size(max = 50, message = "El apellido no puede exceder los 50 caracteres")
     private String apellido;
 
     @NotBlank(message = "El telefono no puede estar vacío")
+    @NotNull(message = "El telefono no puede ser nulo")
     @Size(max = 50, message = "El telefono no puede exceder los 50 caracteres")
     private String telefono;
 
     @NotBlank(message = "La direccion no puede estar vacía")
+    @NotNull(message = "La direccion no puede ser nula")
     @Size(max = 50, message = "El direccion no puede exceder los 50 caracteres")
     private String direccion;
 
