@@ -44,7 +44,14 @@ URL Base: `/api/camiones`
 ### 2. Obtener Lista de Camiones
 - **Método HTTP:** `GET`
 - **Ruta:** `/api/camiones`
-- **Descripción:** Obtiene únicamente los camiones que cuenten con su estado activo (`estado = true`).
+- **Descripción:** Obtiene únicamente los camiones que cuenten con su estado activo (`estado = true`). Además permite filtrar por disponibilidad en un rango de fechas y por capacidad de carga.
+- **Parámetros de consulta:**
+  - `fechaDesde` (opcional): Fecha de inicio del período de reserva. Formato `YYYY-MM-DD HH:MM:SS`.
+  - `fechaHasta` (opcional): Fecha de fin del período de reserva. Formato `YYYY-MM-DD HH:MM:SS`.
+  - `capacidadCargaKg` (opcional): Capacidad mínima de carga requerida en kilogramos.
+- **Validaciones:**
+  - Si se proporcionan `fechaDesde` y `fechaHasta`, `fechaDesde` no puede ser posterior a `fechaHasta`.
+  - Si se proporciona `fechaDesde`, no puede ser anterior a la fecha actual.
 - **Códigos de Estado:** `200 OK`
 - **Response (Ejemplo):**
   ```json
