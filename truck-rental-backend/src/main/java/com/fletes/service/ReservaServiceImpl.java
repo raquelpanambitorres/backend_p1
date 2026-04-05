@@ -40,11 +40,14 @@ public class ReservaServiceImpl implements ReservaService {
         Reserva reserva = new Reserva();
         Optional<CamionResponseDTO> camion;
 
+        if (dto.getFechaDesde().before(new Timestamp(System.currentTimeMillis()))) {
+            throw new IllegalArgumentException("La fecha de inicio no puede ser anterior a la fecha actual");
+        }
         if (dto.getFechaDesde().after(dto.getFechaHasta())) {
             throw new IllegalArgumentException("La fecha de inicio no puede ser posterior a la fecha de fin");
         }
         if (dto.getIdCamion() == null) {
-            List<CamionResponseDTO> camionesDisponibles = camionService.getAll();
+            List<CamionResponseDTO> camionesDisponibles = camionService.getAll(null, null, dto.getPesoCargaKg());
             camion = camionesDisponibles.stream()
                                     .filter(c -> c.getCapacidadCargaKg() >= dto.getPesoCargaKg())
                                     .findAny();

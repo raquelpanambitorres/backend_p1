@@ -7,7 +7,7 @@ import com.fletes.dto.CamionResponseDTO;
 
 public interface CamionService {
     CamionResponseDTO create(CamionRequestDTO dto);
-    List<CamionResponseDTO> getAll();
+    List<CamionResponseDTO> getAll(String fechaDesde, String fechaHasta, Float capacidadCargaKg);
     CamionResponseDTO getById(Integer id);
     CamionResponseDTO update(Integer id, CamionRequestDTO dto);
     void setEstado(Integer id, boolean estado);
