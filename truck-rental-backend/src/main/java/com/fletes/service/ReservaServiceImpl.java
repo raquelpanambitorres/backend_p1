@@ -117,7 +117,7 @@ public class ReservaServiceImpl implements ReservaService {
     }
 
     @Transactional
-    @Scheduled(every="3s") // cada 3 segundos
+    @Scheduled(every = "3s") // cada 3 segundos
     @SuppressWarnings("unused")
     void actualizarDisponibilidad() {
         if (repository.count() > 0) {
@@ -129,7 +129,7 @@ public class ReservaServiceImpl implements ReservaService {
                     reserva.setEstado(false);
                     repository.update(reserva);
                     camionService.setEstado(reserva.getIdCamion().getId(), true);
-                }else if (reserva.getFechaDesde().before(new Timestamp(System.currentTimeMillis()))) {
+                } else if (reserva.getFechaDesde().before(new Timestamp(System.currentTimeMillis()))) {
                     camionService.setEstado(reserva.getIdCamion().getId(), false);
                 }
             }

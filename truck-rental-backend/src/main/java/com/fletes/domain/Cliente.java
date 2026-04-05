@@ -19,7 +19,7 @@ public class Cliente {
     @Column(name = "telefono", length = 50, nullable = false)
     private String telefono;
 
-    @Column(name = "direccion", length = 50, updatable = false)
+    @Column(name = "direccion", length = 50, nullable = false)
     private String direccion;
 
 
