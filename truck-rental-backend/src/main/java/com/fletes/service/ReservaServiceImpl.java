@@ -14,7 +14,6 @@ import com.fletes.repository.CamionRepository;
 import com.fletes.repository.ClienteRepository;
 import com.fletes.repository.ReservaRepository;
 
-import io.quarkus.scheduler.Scheduled;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
@@ -76,6 +75,7 @@ public class ReservaServiceImpl implements ReservaService {
 
     @Override
     public List<ReservaResponseDTO> getAll() {
+        actualizarDisponibilidad();
         return repository.findAll().stream()
                 .map(this::toDTO)
                 .filter(dto -> dto.getEstado() == true)
@@ -84,6 +84,7 @@ public class ReservaServiceImpl implements ReservaService {
 
     @Override
     public ReservaResponseDTO getById(Integer id) {
+        actualizarDisponibilidad();
         Reserva reserva = repository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Reserva no encontrado con ID " + id));
         return toDTO(reserva);
@@ -117,8 +118,6 @@ public class ReservaServiceImpl implements ReservaService {
     }
 
     @Transactional
-    @Scheduled(every = "3s") // cada 3 segundos
-    @SuppressWarnings("unused")
     void actualizarDisponibilidad() {
         if (repository.count() > 0) {
             List<Reserva> reservas = repository.findAll().stream()

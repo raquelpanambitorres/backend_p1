@@ -38,8 +38,8 @@ public class CamionServiceImpl implements CamionService {
 
     @Override
     public List<CamionResponseDTO> getAll(String fechaDesde, String fechaHasta, Float capacidadCargaKg) {
-        List<Camion> filtrados = repository.findAllActivos();
         List<ReservaResponseDTO> reservas = reservaService.getAll();
+        List<Camion> filtrados = repository.findAllActivos();
         if (fechaDesde != null && fechaHasta != null) {
             Timestamp timeFechaDesde = Timestamp.valueOf(fechaDesde);
             Timestamp timeFechaHasta = Timestamp.valueOf(fechaHasta);
