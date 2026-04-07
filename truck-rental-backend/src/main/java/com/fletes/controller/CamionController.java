@@ -40,7 +40,7 @@ public class CamionController {
         @QueryParam("fechaHasta") String fechaHasta,
         @QueryParam("capacidadCargaKg") Float capacidadCargaKg
     ) {
-        List<CamionResponseDTO> camiones = camionService.getAll(fechaDesde, fechaHasta, capacidadCargaKg);
+        List<CamionResponseDTO> camiones = camionService.getFiltered(fechaDesde, fechaHasta, capacidadCargaKg, true);
         return Response.ok(camiones).build();
     }
 

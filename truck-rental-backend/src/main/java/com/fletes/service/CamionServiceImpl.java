@@ -37,9 +37,14 @@ public class CamionServiceImpl implements CamionService {
     }
 
     @Override
-    public List<CamionResponseDTO> getAll(String fechaDesde, String fechaHasta, Float capacidadCargaKg) {
+    public List<CamionResponseDTO> getFiltered(String fechaDesde, String fechaHasta, Float capacidadCargaKg, Boolean activos) {
         List<ReservaResponseDTO> reservas = reservaService.getAll();
-        List<Camion> filtrados = repository.findAllActivos();
+        List<Camion> filtrados = activos ? repository.findAllActivos() : repository.findAll();
+
+        if ((fechaDesde == null && fechaHasta != null) || (fechaDesde != null && fechaHasta == null)) {
+            throw new IllegalArgumentException("Ambas fechas deben ser proporcionadas para filtrar por rango de fechas");
+        }
+
         if (fechaDesde != null && fechaHasta != null) {
             Timestamp timeFechaDesde = Timestamp.valueOf(fechaDesde);
             Timestamp timeFechaHasta = Timestamp.valueOf(fechaHasta);
@@ -64,6 +69,9 @@ public class CamionServiceImpl implements CamionService {
         }
         List<CamionResponseDTO> resultado = filtrados.stream().map(this::toDTO).collect(Collectors.toList());
         if (resultado.isEmpty()) {
+            if (activos == false) {
+                throw new EntityNotFoundException("No se encontraron camiones disponibles con los filtros aplicados para la reserva");
+            }
             throw new EntityNotFoundException("No se encontraron camiones con los filtros aplicados");
         }
         return resultado;

@@ -1,6 +1,7 @@
 package com.fletes.service;
 
 import java.sql.Timestamp;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -37,31 +38,32 @@ public class ReservaServiceImpl implements ReservaService {
     @Transactional
     public ReservaResponseDTO create(ReservaRequestDTO dto) {
         Reserva reserva = new Reserva();
-        Optional<CamionResponseDTO> camion;
-
+        List<CamionResponseDTO> camiones;
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         if (dto.getFechaDesde().before(new Timestamp(System.currentTimeMillis()))) {
             throw new IllegalArgumentException("La fecha de inicio no puede ser anterior a la fecha actual");
         }
         if (dto.getFechaDesde().after(dto.getFechaHasta())) {
             throw new IllegalArgumentException("La fecha de inicio no puede ser posterior a la fecha de fin");
         }
-        if (dto.getIdCamion() == null) {
-            List<CamionResponseDTO> camionesDisponibles = camionService.getAll(null, null, dto.getPesoCargaKg());
-            camion = camionesDisponibles.stream()
-                                    .filter(c -> c.getCapacidadCargaKg() >= dto.getPesoCargaKg())
-                                    .findAny();
-            if (!camion.isPresent()) {
-                throw new EntityNotFoundException("No hay camiones disponibles con la capacidad de carga requerida");
+
+        camiones = camionService.getFiltered(dto.getFechaDesde().toLocalDateTime().format(formatter), dto.getFechaHasta().toLocalDateTime().format(formatter), dto.getPesoCargaKg(), false);
+        if (camiones.isEmpty()) {
+            throw new EntityNotFoundException("No hay camiones disponibles con los criterios especificados en la fecha indicada");
+        }
+
+        if (dto.getIdCamion() != null) {
+            Optional<CamionResponseDTO> camionOpt = camiones.stream()
+                    .filter(c -> c.getId().equals(dto.getIdCamion()))
+                    .findFirst();
+            if (camionOpt.isEmpty()) {
+                throw new EntityNotFoundException("El camión especificado no está disponible en el rango de fechas indicado o no posee la capacidad de carga requerida");
             }
-        }else{
-            camion = Optional.ofNullable(camionService.getById(dto.getIdCamion()));
-            if (camion.get().getCapacidadCargaKg() < dto.getPesoCargaKg()) {
-                throw new IllegalArgumentException("El camión seleccionado no tiene la capacidad de carga requerida");
-            }
+            camiones = List.of(camionOpt.get());
         }
 
         // camionService.setEstado(camion.get().getId(), false);
-        reserva.setIdCamion(camionRepository.findById(camion.get().getId()).get());
+        reserva.setIdCamion(camionRepository.findById(camiones.get(0).getId()).get());
         reserva.setIdCliente(clienteRepository.findById(dto.getIdCliente()).get());
         reserva.setFechaDesde(dto.getFechaDesde());
         reserva.setFechaHasta(dto.getFechaHasta());
@@ -133,5 +135,23 @@ public class ReservaServiceImpl implements ReservaService {
                 }
             }
         }
+    }
+
+    @SuppressWarnings("unused")
+    List<ReservaResponseDTO> getByRange(Timestamp fechaDesde, Timestamp fechaHasta) {
+        List<ReservaResponseDTO> reservas = getAll();
+        reservas = reservas.stream()
+                .filter(r -> 
+                    (((r.getFechaDesde().before(fechaDesde) || r.getFechaDesde().equals(fechaDesde))
+                        && r.getFechaHasta().after(fechaDesde)) ||
+                    (r.getFechaDesde().before(fechaHasta)
+                        && (r.getFechaHasta().after(fechaHasta) || r.getFechaHasta().equals(fechaHasta))) ||
+                    ((r.getFechaDesde().after(fechaDesde) || r.getFechaDesde().equals(fechaDesde))
+                        && (r.getFechaHasta().before(fechaHasta) || r.getFechaHasta().equals(fechaHasta)))))
+                .collect(Collectors.toList());
+        if (reservas.isEmpty()) {
+            throw new EntityNotFoundException("No se encontraron reservas en el rango de fechas especificado");
+        }
+        return reservas;
     }
 }
